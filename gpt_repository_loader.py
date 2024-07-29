@@ -20,17 +20,19 @@ def should_ignore(file_path, ignore_list):
     return False
 
 def process_repository(repo_path, ignore_list, output_file):
+    valid_extensions = ('.ts', '.tsx', '.css', '.java')  # Include Java files in the filter
     for root, _, files in os.walk(repo_path):
         for file in files:
-            file_path = os.path.join(root, file)
-            relative_file_path = os.path.relpath(file_path, repo_path)
+            if file.endswith(valid_extensions):  # Check if the file has a valid extension
+                file_path = os.path.join(root, file)
+                relative_file_path = os.path.relpath(file_path, repo_path)
 
-            if not should_ignore(relative_file_path, ignore_list):
-                with open(file_path, 'r', errors='ignore') as file:
-                    contents = file.read()
-                output_file.write("-" * 4 + "\n")
-                output_file.write(f"{relative_file_path}\n")
-                output_file.write(f"{contents}\n")
+                if not should_ignore(relative_file_path, ignore_list):
+                    with open(file_path, 'r', errors='ignore') as file:
+                        contents = file.read()
+                    output_file.write("-" * 4 + "\n")
+                    output_file.write(f"{relative_file_path}\n")
+                    output_file.write(f"{contents}\n")
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
@@ -71,4 +73,3 @@ if __name__ == "__main__":
     with open(output_file_path, 'a') as output_file:
         output_file.write("--END--")
     print(f"Repository contents written to {output_file_path}.")
-    
